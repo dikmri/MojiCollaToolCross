@@ -64,7 +64,26 @@ namespace MojiCollaTool
 
             MojiListView.ItemsSource = _viewMojiPanels;
 
+            // テーマ ComboBox を保存済み設定に合わせる
+            ThemeComboBox.SelectedIndex = ThemeManager.CurrentSetting switch
+            {
+                AppTheme.Light => 1,
+                AppTheme.Dark  => 2,
+                _              => 0
+            };
+
             ResetScale();
+        }
+
+        private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var theme = ThemeComboBox.SelectedIndex switch
+            {
+                1 => AppTheme.Light,
+                2 => AppTheme.Dark,
+                _ => AppTheme.System
+            };
+            ThemeManager.SetTheme(theme);
         }
 
         /// <summary>

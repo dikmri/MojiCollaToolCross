@@ -1,33 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Effects;
+using Avalonia.Controls;
+using Avalonia.Media;
+using System;
 
-namespace MojiCollaTool
+namespace MojiCollaTool;
+
+public class BlurredElement : Control
 {
-    public class BlurredElement : FrameworkElement
+    private readonly Action<DrawingContext> _action;
+
+    public BlurredElement(Action<DrawingContext> action, double radius)
     {
-        private Action<DrawingContext> _action;
-        private double _radius;
+        _action = action;
+        if (radius > 0)
+            Effect = new BlurEffect { Radius = radius };
+    }
 
-        public BlurredElement(Action<DrawingContext> action, double radius)
-        {
-            this._action = action;
-            _radius = radius;
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-            _action(drawingContext);
-            Effect = new BlurEffect
-            {
-                Radius = _radius,
-            };
-        }
+    public override void Render(DrawingContext drawingContext)
+    {
+        _action(drawingContext);
     }
 }

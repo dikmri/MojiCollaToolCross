@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="Theme.Background"          Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="Theme.SurfaceBackground"   Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.ControlBackground"   Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Theme.ReadOnlyBackground"  Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="Theme.Foreground"          Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="Theme.SubtleForeground"    Color="#767676"/>
+    <SolidColorBrush x:Key="Theme.Border"              Color="#ADADAD"/>
+    <SolidColorBrush x:Key="Theme.ButtonBackground"    Color="#DDDDDD"/>
+    <SolidColorBrush x:Key="Theme.ButtonHover"         Color="#BEE6FD"/>
+    <SolidColorBrush x:Key="Theme.ButtonPressed"       Color="#C4E5F6"/>
+    <SolidColorBrush x:Key="Theme.ButtonDisabled"      Color="#F4F4F4"/>
+    <SolidColorBrush x:Key="Theme.SelectionBackground" Color="#CCE8FF"/>
+    <SolidColorBrush x:Key="Theme.SelectionForeground" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="Theme.CanvasArea"          Color="#808080"/>
+    <SolidColorBrush x:Key="Theme.GroupBoxBorder"      Color="#AAAAAA"/>
+    <SolidColorBrush x:Key="Theme.PopupBackground"     Color="#FFFFFF"/>
+</ResourceDictionary>

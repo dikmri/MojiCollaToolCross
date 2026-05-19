@@ -1,47 +1,32 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>mctool-icon.ico</ApplicationIcon>
+    <AssemblyName>MojiCollaToolCross</AssemblyName>
     <AssemblyVersion>1.3.0.1</AssemblyVersion>
     <FileVersion>1.3.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Images\canvas.png" />
-    <None Remove="Images\copy.png" />
-    <None Remove="Images\delete.png" />
-    <None Remove="Images\folder.png" />
-    <None Remove="Images\folder16.png" />
-    <None Remove="Images\image.png" />
-    <None Remove="Images\moji.png" />
-    <None Remove="Images\mojiimage.png" />
-    <None Remove="Images\multi.png" />
-    <None Remove="Images\new.png" />
-    <None Remove="Images\save.png" />
-    <None Remove="Images\save16.png" />
+    <PackageReference Include="Avalonia" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
   </ItemGroup>
 
+  <!-- WPF固有ファイル：移植作業中の参照用にディスク上に残す -->
   <ItemGroup>
-    <Content Include="mctool-icon.ico" />
+    <Compile Remove="AssemblyInfo.cs" />
+    <Compile Remove="ColorSelector\ColorPicker.xaml.cs" />
+    <Compile Remove="ColorSelector\ColorSelectorWindow.xaml.cs" />
+    <Compile Remove="App.xaml.cs" />
+    <Compile Remove="MainWindow.xaml.cs" />
+    <Compile Remove="MojiWindow.xaml.cs" />
+    <Compile Remove="CanvasEditWindow.xaml.cs" />
+    <Compile Remove="UpDownTextBox.xaml.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Images\canvas.png" />
-    <Resource Include="Images\copy.png" />
-    <Resource Include="Images\delete.png" />
-    <Resource Include="Images\folder.png" />
-    <Resource Include="Images\folder16.png" />
-    <Resource Include="Images\image.png" />
-    <Resource Include="Images\moji.png" />
-    <Resource Include="Images\mojiimage.png" />
-    <Resource Include="Images\multi.png" />
-    <Resource Include="Images\new.png" />
-    <Resource Include="Images\save.png" />
-    <Resource Include="Images\save16.png" />
-  </ItemGroup>
 
 </Project>

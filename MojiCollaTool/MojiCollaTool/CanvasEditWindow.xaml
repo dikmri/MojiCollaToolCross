@@ -43,7 +43,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="VirtualImageGrid" Grid.Column="0" VerticalAlignment="Top" Background="White" Margin="5">
+                <Grid x:Name="VirtualImageGrid" Grid.Column="0" VerticalAlignment="Top" Background="{DynamicResource Theme.SurfaceBackground}" Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>

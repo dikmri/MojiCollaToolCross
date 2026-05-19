@@ -1,1 +1,12 @@
+# 出力・テスト
 /OutputTest
+
+# 仕様書（非公開）
+SPEC.md
+
+# publish 出力
+publish/
+
+# .NET ビルド成果物（サブフォルダの .gitignore でも定義済みだが念のため）
+[Bb]in/
+[Oo]bj/

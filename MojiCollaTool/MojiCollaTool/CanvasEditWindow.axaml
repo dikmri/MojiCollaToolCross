@@ -1,0 +1,85 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:MojiCollaTool"
+        x:Class="MojiCollaTool.CanvasEditWindow"
+        WindowStartupLocation="CenterOwner"
+        Title="キャンバス設定画面" Height="450" Width="700">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <GroupBox x:Name="MultiImageLocateGroupBox" Header="複数画像の配置" IsEnabled="False" Grid.Row="0" Margin="5">
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border BorderBrush="Black" BorderThickness="1" Background="LightBlue" Width="100" Height="30" Grid.Row="1" Grid.Column="1">
+                    <TextBlock Text="画像１" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Border>
+                <Button x:Name="Image2TopButton" Tag="Top" Content="▲" Grid.Row="0" Grid.Column="1" Width="100" Height="30" Click="Image2LocateButton"/>
+                <Button x:Name="Image2BottomButton" Tag="Bottom" Content="▼" Grid.Row="2" Grid.Column="1" Width="100" Height="30" Click="Image2LocateButton"/>
+                <Button x:Name="Image2LeftButton" Tag="Left" Content="◀" Grid.Row="1" Grid.Column="0" Width="100" Height="30" Click="Image2LocateButton"/>
+                <Button x:Name="Image2RightButton" Tag="Right" Content="▶" Grid.Row="1" Grid.Column="2" Width="100" Height="30" Click="Image2LocateButton"/>
+                <Border x:Name="Image2Rect" BorderBrush="Black" BorderThickness="1" Background="LightCoral" Width="100" Height="30" IsVisible="False" Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="画像２" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Border>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="キャンバスサイズ" Grid.Row="1" Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid x:Name="VirtualImageGrid" Grid.Column="0" VerticalAlignment="Top" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="Black" BorderThickness="1" Background="LightBlue" Width="150" Height="150" Grid.Row="1" Grid.Column="1">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <TextBlock Text="画像" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="40"/>
+                            <TextBlock x:Name="ImageWidthHeighTextBlock" HorizontalAlignment="Center" FontSize="15" Text="←横→:0px&#10;↑縦↓:0px"/>
+                        </StackPanel>
+                    </Border>
+                    <local:UpDownTextBox x:Name="TopTextBox" ValueMinLimit="0" Height="28" Grid.Row="0" Grid.Column="1" Width="120" ValueChanged="DirectionTextBox_ValueChanged"/>
+                    <local:UpDownTextBox x:Name="BottomTextBox" ValueMinLimit="0" Height="28" Grid.Row="2" Grid.Column="1" Width="120" ValueChanged="DirectionTextBox_ValueChanged"/>
+                    <local:UpDownTextBox x:Name="LeftTextBox" ValueMinLimit="0" Height="28" Grid.Row="1" Grid.Column="0" Width="120" ValueChanged="DirectionTextBox_ValueChanged"/>
+                    <local:UpDownTextBox x:Name="RightTextBox" ValueMinLimit="0" Height="28" Grid.Row="1" Grid.Column="2" Width="120" ValueChanged="DirectionTextBox_ValueChanged"/>
+                    <Button x:Name="ResetButton" Content="リセット" Width="100" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2" Click="ResetButton_Click"/>
+                </Grid>
+                <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="←横→:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CanvasWidthTextBox" Width="100" IsReadOnly="True"/>
+                        <TextBlock Text="px" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="↑縦↓:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CanvasHeightTextBox" Width="100" IsReadOnly="True"/>
+                        <TextBlock Text="px" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="背景色:" VerticalAlignment="Center"/>
+                        <Button x:Name="CanvasColorButton" Width="100" Height="28" Background="White" Click="CanvasColorButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

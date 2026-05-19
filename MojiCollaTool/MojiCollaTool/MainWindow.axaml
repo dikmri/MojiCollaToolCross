@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:MojiCollaTool"
+        x:Class="MojiCollaTool.MainWindow"
+        Title="MojiCollaTool ver1.0.0.0" Height="675" Width="1400"
+        MinWidth="1400" MinHeight="500">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ツールバー -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+            <Button x:Name="InitButton" Margin="5" Click="InitButton_Click">
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="新規作成する" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="SwapImageButton" Margin="5" Click="SwapImageButton_Click">
+                <TextBlock Text="画像のみ入れ替える" VerticalAlignment="Center"/>
+            </Button>
+            <Button x:Name="MultiImageButton" Margin="5" Click="MultiImageButton_Click" MinWidth="100">
+                <TextBlock Text="画像を並べる" VerticalAlignment="Center"/>
+            </Button>
+            <Button x:Name="LoadProjectButton" Margin="5" Click="LoadProjectButton_Click">
+                <TextBlock Text="プロジェクトを読み出す" VerticalAlignment="Center"/>
+            </Button>
+            <Button x:Name="SaveProjectButton" Margin="5" Click="SaveProjectButton_Click">
+                <TextBlock Text="プロジェクトを保存する" VerticalAlignment="Center"/>
+            </Button>
+            <Button x:Name="OutputImageButton" Margin="5" Click="OutputImageButton_Click">
+                <TextBlock Text="文字コラ画像を出力する" VerticalAlignment="Center"/>
+            </Button>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="拡大・縮小:" VerticalAlignment="Center"/>
+                <local:UpDownTextBox x:Name="ScalingTextBox" ValueMinLimit="10" Step="10" ValueChanged="ScalingTextBox_ValueChanged"/>
+                <TextBlock Text="%" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
+                <TextBlock Text="テーマ:" VerticalAlignment="Center"/>
+                <ComboBox x:Name="ThemeComboBox" Width="90" VerticalContentAlignment="Center"
+                          SelectionChanged="ThemeComboBox_SelectionChanged">
+                    <ComboBoxItem Content="システム"/>
+                    <ComboBoxItem Content="ライト"/>
+                    <ComboBoxItem Content="ダーク"/>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+
+        <Button x:Name="AddTextButton" Grid.Row="0" Grid.Column="1" Margin="5" Click="AddTextButton_Click">
+            <TextBlock Text="文字を追加する" VerticalAlignment="Center" Margin="5"/>
+        </Button>
+
+        <!-- キャンバスエリア -->
+        <ScrollViewer Grid.Row="1" Grid.RowSpan="2" Grid.Column="0"
+                      HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
+                      x:Name="CanvasScrollViewer">
+            <Grid x:Name="CanvasGrid" Background="Gray">
+                <LayoutTransformControl x:Name="CanvasLTC">
+                    <Canvas x:Name="MainCanvas" Background="Gray">
+                        <Rectangle x:Name="CanvasBackgroundRect"/>
+                        <Image x:Name="ImageControl1"/>
+                        <Image x:Name="ImageControl2"/>
+                    </Canvas>
+                </LayoutTransformControl>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- 文字リスト -->
+        <GroupBox Header="文字リスト" Grid.Row="1" Grid.Column="1">
+            <ListBox x:Name="MojiListView">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:MojiPanel">
+                        <Border BorderBrush="Gray" BorderThickness="1" Padding="5">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="ID:"/>
+                                    <TextBlock Text="{Binding Id}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding ExampleText}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+
+        <Button x:Name="CanvasEditButton" Grid.Row="2" Grid.Column="1" Margin="5" Click="CanvasEditButton_Click">
+            <TextBlock Text="キャンバスを設定する" VerticalAlignment="Center" Margin="5"/>
+        </Button>
+    </Grid>
+</Window>

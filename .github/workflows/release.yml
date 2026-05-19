@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build (Windows x64)
+        run: dotnet publish MojiCollaTool/MojiCollaTool/MojiCollaTool.csproj -r win-x64 -c Release --self-contained -o publish/win
+
+      - name: Build (macOS x64)
+        run: dotnet publish MojiCollaTool/MojiCollaTool/MojiCollaTool.csproj -r osx-x64 -c Release --self-contained -o publish/mac-x64
+
+      - name: Build (macOS arm64)
+        run: dotnet publish MojiCollaTool/MojiCollaTool/MojiCollaTool.csproj -r osx-arm64 -c Release --self-contained -o publish/mac-arm64
+
+      - name: Build (Linux x64)
+        run: dotnet publish MojiCollaTool/MojiCollaTool/MojiCollaTool.csproj -r linux-x64 -c Release --self-contained -o publish/linux
+
+      - name: Create zip archives
+        run: |
+          cd publish
+          zip -r ../MojiCollaToolCross-win-x64.zip    win/
+          zip -r ../MojiCollaToolCross-osx-x64.zip    mac-x64/
+          zip -r ../MojiCollaToolCross-osx-arm64.zip  mac-arm64/
+          zip -r ../MojiCollaToolCross-linux-x64.zip  linux/
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGES=$(git log "${PREV_TAG}..HEAD" --pretty=format:"- %s")
+          else
+            CHANGES=$(git log HEAD --pretty=format:"- %s" | head -30)
+          fi
+          {
+            echo "changes<<CHANGELOG_EOF"
+            echo "$CHANGES"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body: |
+            ## 変更点
+            ${{ steps.changelog.outputs.changes }}
+          files: |
+            MojiCollaToolCross-win-x64.zip
+            MojiCollaToolCross-osx-x64.zip
+            MojiCollaToolCross-osx-arm64.zip
+            MojiCollaToolCross-linux-x64.zip
