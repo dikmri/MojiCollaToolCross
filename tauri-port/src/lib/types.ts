@@ -30,10 +30,10 @@ export interface MojiData {
 }
 
 export interface ImageData {
-  filePath: string;
-  width: number;
+  dataUrl: string;        // base64 data URL。'' = 画像なし
+  width: number;          // 元画像の自然サイズ
   height: number;
-  modifiedWidth: number;
+  modifiedWidth: number;  // 表示サイズ（0 = 自然サイズを使用）
   modifiedHeight: number;
 }
 
@@ -87,7 +87,7 @@ export function createDefaultMojiData(id: number): MojiData {
 }
 
 export function createDefaultImageData(): ImageData {
-  return { filePath: '', width: 0, height: 0, modifiedWidth: 0, modifiedHeight: 0 };
+  return { dataUrl: '', width: 0, height: 0, modifiedWidth: 0, modifiedHeight: 0 };
 }
 
 export function createDefaultCanvasData(): CanvasData {
