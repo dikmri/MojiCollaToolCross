@@ -66,14 +66,21 @@ export async function renderToPngDataUrl(
 
   // SVGテキストレイヤー（クローンして新規SVGに移す）
   const exportSvg = document.createElementNS(ns, 'svg');
-  exportSvg.setAttribute('xmlns', ns);
-  exportSvg.setAttribute('width',   String(cw));
-  exportSvg.setAttribute('height',  String(ch));
-  exportSvg.setAttribute('viewBox', `0 0 ${cw} ${ch}`);
-  exportSvg.style.overflow = 'hidden';
+  exportSvg.setAttribute('xmlns',    ns);
+  exportSvg.setAttribute('width',    String(cw));
+  exportSvg.setAttribute('height',   String(ch));
+  exportSvg.setAttribute('viewBox',  `0 0 ${cw} ${ch}`);
+  // CSS styleではなくSVGプレゼンテーション属性で overflow を設定する
+  exportSvg.setAttribute('overflow', 'hidden');
 
   const clone = svgEl.cloneNode(true) as SVGSVGElement;
   while (clone.firstChild) exportSvg.appendChild(clone.firstChild);
+
+  // 選択インジケータ（青い破線枠）を除去
+  exportSvg.querySelectorAll('[data-hit-rect]').forEach(el => {
+    el.setAttribute('stroke', 'none');
+    el.removeAttribute('stroke-dasharray');
+  });
 
   const serializer = new XMLSerializer();
   const svgStr = serializer.serializeToString(exportSvg);
@@ -83,7 +90,11 @@ export async function renderToPngDataUrl(
   try {
     await new Promise<void>((resolve, reject) => {
       const img = new Image();
-      img.onload  = () => { ctx.drawImage(img, 0, 0); resolve(); };
+      img.onload = () => {
+        // naturalSize が 0 になる環境でも正しく描画されるよう明示的に cw×ch を指定する
+        ctx.drawImage(img, 0, 0, cw, ch);
+        resolve();
+      };
       img.onerror = () => reject(new Error('SVG→Canvas render failed'));
       img.src = url;
     });

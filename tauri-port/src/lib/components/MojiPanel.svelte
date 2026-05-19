@@ -174,6 +174,7 @@
   <!-- Interaction overlay: drag handle + selection border -->
   <rect
     bind:this={hitEl}
+    data-hit-rect="true"
     x={bbox.x - 4}
     y={bbox.y - 4}
     width={bbox.w + 8}
