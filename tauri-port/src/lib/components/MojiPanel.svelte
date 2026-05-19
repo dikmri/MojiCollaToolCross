@@ -32,7 +32,7 @@
 
   // CSS style string per <text> element
   const textStyle = $derived(
-    (isVertical ? 'writing-mode: vertical-rl; ' : '') +
+    (isVertical ? 'writing-mode: vertical-rl; text-orientation: upright; ' : '') +
     'dominant-baseline: hanging; ' +
     `letter-spacing: ${moji.characterMargin}px;`
   );
