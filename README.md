@@ -7,7 +7,7 @@
 [MojiCollaTool](https://github.com/kuramiya/MojiCollaTool)
 
 ## ダウンロード
-Releasesからどうぞ。  
+[最新版](https://github.com/dikmri/MojiCollaToolCross/releases/latest)からどうぞ。  
 OS別の実行バイナリを含むzip形式で配布しています。
 
 ## インストール方法
