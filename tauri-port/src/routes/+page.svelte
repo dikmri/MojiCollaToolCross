@@ -12,6 +12,34 @@
   const ch = $derived(appState.canvasData.canvasHeight);
   const canvasBg = $derived(argbToRgba(appState.canvasData.canvasColor));
 
+  // 画像表示サイズ（modifiedWidth/Height が 0 なら自然サイズを使用）
+  const img1Style = $derived(() => {
+    const cd = appState.canvasData;
+    const img = cd.imageData1;
+    if (!img.dataUrl) return null;
+    const w = img.modifiedWidth  || img.width;
+    const h = img.modifiedHeight || img.height;
+    return `position:absolute;left:${cd.imageMarginLeft}px;top:${cd.imageMarginTop}px;width:${w}px;height:${h}px;`;
+  });
+
+  const img2Style = $derived(() => {
+    const cd = appState.canvasData;
+    const img1 = cd.imageData1;
+    const img2 = cd.imageData2;
+    if (!img2.dataUrl) return null;
+    const w1 = img1.modifiedWidth  || img1.width;
+    const h1 = img1.modifiedHeight || img1.height;
+    const w2 = img2.modifiedWidth  || img2.width;
+    const h2 = img2.modifiedHeight || img2.height;
+    const x1 = cd.imageMarginLeft;
+    const y1 = cd.imageMarginTop;
+    const x2 = cd.image2LocatePosition === 'left'  ? x1 - w2
+              : cd.image2LocatePosition === 'right' ? x1 + w1 : x1;
+    const y2 = cd.image2LocatePosition === 'top'    ? y1 - h2
+              : cd.image2LocatePosition === 'bottom' ? y1 + h1 : y1;
+    return `position:absolute;left:${x2}px;top:${y2}px;width:${w2}px;height:${h2}px;`;
+  });
+
   // File operations
   async function handleOpen() {
     const result = await openProject();
@@ -79,12 +107,7 @@
     if (!canvasSvgEl || isExporting) return;
     isExporting = true;
     try {
-      const dataUrl = await renderToPngDataUrl(
-        canvasSvgEl,
-        appState.canvasData.canvasWidth,
-        appState.canvasData.canvasHeight,
-        appState.canvasData.canvasColor,
-      );
+      const dataUrl = await renderToPngDataUrl(canvasSvgEl, appState.canvasData);
       await savePngDialog(dataUrl);
     } finally {
       isExporting = false;
@@ -187,6 +210,14 @@
             transform-origin: top left;
           "
         >
+          <!-- 画像レイヤー（SVGより手前に描画されないよう先に配置） -->
+          {#if img1Style()}
+            <img src={appState.canvasData.imageData1.dataUrl} style={img1Style()!} alt="" draggable="false" />
+          {/if}
+          {#if img2Style()}
+            <img src={appState.canvasData.imageData2.dataUrl} style={img2Style()!} alt="" draggable="false" />
+          {/if}
+
           <!-- 全MojiPanelを1つのSVGにまとめる（OverflowをvisibleにしてはみだしOK） -->
           <svg
             bind:this={canvasSvgEl}
