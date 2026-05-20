@@ -7,37 +7,40 @@
 [MojiCollaTool](https://github.com/kuramiya/MojiCollaTool)
 
 ## ダウンロード
-[最新版](https://github.com/dikmri/MojiCollaToolCross/releases/latest)からどうぞ。  
-OS別の実行バイナリを含むzip形式で配布しています。
+[最新版](https://github.com/dikmri/MojiCollaToolCross/releases/latest)からどうぞ。
 
 ## インストール方法
 
 ### Windows
-1. Releases から `win-x64.zip` をダウンロードして解凍する
-2. `MojiCollaToolCross.exe` をダブルクリックで起動
+1. Releases から `.msi` をダウンロードして実行する
+2. インストーラーの指示に従ってインストール完了
+
+> インストーラーなしで使いたい場合は `.exe` をダウンロードしてそのまま起動できます。
 
 ### macOS
-1. Releases から `osx-x64.zip` をダウンロードして解凍する
-2. ターミナルで実行権限を付与して起動する
-```bash
-chmod +x MojiCollaToolCross
-./MojiCollaToolCross
-```
-> macOS Gatekeeper の警告が出る場合は、システム設定 → プライバシーとセキュリティ から許可してください。
+1. Releases から `.dmg` をダウンロードして開く
+   - Apple Silicon (M1以降): `_aarch64.dmg`
+   - Intel Mac: `_x64.dmg`
+2. アプリをアプリケーションフォルダへドラッグ＆ドロップ
+
+> macOS Gatekeeper の警告が出る場合は、システム設定 → プライバシーとセキュリティ から「このまま開く」を選択してください。
 
 ### Linux
-1. Releases から `linux-x64.zip` をダウンロードして解凍する
-2. ターミナルで実行権限を付与して起動する
+1. Releases から `.AppImage` または `.deb` をダウンロードする
+2. AppImage の場合:
 ```bash
-chmod +x MojiCollaToolCross
-./MojiCollaToolCross
+chmod +x MojiCollaToolCross_*.AppImage
+./MojiCollaToolCross_*.AppImage
+```
+3. .deb の場合:
+```bash
+sudo dpkg -i MojiCollaToolCross_*.deb
 ```
 
 ### ソースからビルドする場合（全OS共通）
-[.NET 8 SDK](https://dotnet.microsoft.com/download) をインストールしたうえで以下を実行してください。
+[Rust](https://rustup.rs/) と [Node.js (LTS)](https://nodejs.org/) をインストールしたうえで以下を実行してください。
 ```bash
-cd MojiCollaTool/MojiCollaTool
-dotnet publish -r win-x64   --self-contained -o publish/win
-dotnet publish -r osx-x64   --self-contained -o publish/mac
-dotnet publish -r linux-x64 --self-contained -o publish/linux
+cd tauri-port
+npm install
+npm run tauri build
 ```
