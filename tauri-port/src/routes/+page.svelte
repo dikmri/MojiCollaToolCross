@@ -104,6 +104,9 @@
   // CanvasSettingsDialog
   let isCanvasSettingsOpen = $state(false);
 
+  // 文字リストは前面（配列末尾）が上に来るよう逆順表示
+  const mojiListDisplay = $derived([...appState.mojiList].reverse());
+
   // 文字プロパティパネル: トグル + 最後に選択されたmojiを保持
   let isPropPanelVisible = $state(true);
   let displayedMojiId = $state<number | null>(null);
@@ -265,10 +268,10 @@
   </header>
 
   <div class="main-area">
-    <!-- 左パネル: 文字リスト -->
+    <!-- 左パネル: 文字リスト（前面が上に来るよう逆順表示） -->
     <aside class="moji-list-panel">
       <div class="panel-title">文字リスト</div>
-      {#each appState.mojiList as moji (moji.id)}
+      {#each mojiListDisplay as moji (moji.id)}
         <div
           class="moji-item"
           class:selected={appState.selectedMojiId === moji.id}
