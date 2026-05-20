@@ -21,6 +21,14 @@
   const filterId1 = $derived(`mf1-${moji.id}`);
   const filterId2 = $derived(`mf2-${moji.id}`);
 
+  // CSS identifiers cannot contain '+', spaces, etc. — always quote non-generic names
+  const GENERIC_FONTS = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui']);
+  const fontFamily = $derived(
+    GENERIC_FONTS.has(moji.fontFamilyName)
+      ? moji.fontFamilyName
+      : `'${moji.fontFamilyName.replace(/'/g, "\\'")}'`
+  );
+
   // Line x position: vertical text columns go right-to-left
   function lineX(i: number): number {
     return isVertical ? (lines.length - 1 - i) * (moji.fontSize + moji.lineMargin) : 0;
@@ -125,7 +133,7 @@
   <!-- Second border layer (outer outline) -->
   {#if hasSecondBorder}
     <g
-      font-family={moji.fontFamilyName}
+      font-family={fontFamily}
       font-size={moji.fontSize}
       font-weight={fontWeight}
       font-style={fontStyle}
@@ -145,7 +153,7 @@
   <!-- First border layer (inner outline) -->
   {#if hasBorder}
     <g
-      font-family={moji.fontFamilyName}
+      font-family={fontFamily}
       font-size={moji.fontSize}
       font-weight={fontWeight}
       font-style={fontStyle}
@@ -165,7 +173,7 @@
   <!-- Foreground text (measure bbox from this group) -->
   <g
     bind:this={textGroupEl}
-    font-family={moji.fontFamilyName}
+    font-family={fontFamily}
     font-size={moji.fontSize}
     font-weight={fontWeight}
     font-style={fontStyle}

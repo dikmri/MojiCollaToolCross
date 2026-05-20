@@ -4,8 +4,8 @@
   import ColorField from './ColorField.svelte';
   import FontPicker from './FontPicker.svelte';
 
-  interface Props { moji: MojiData; }
-  let { moji }: Props = $props();
+  interface Props { moji: MojiData; readonly?: boolean; }
+  let { moji, readonly = false }: Props = $props();
 
   function upd<K extends keyof MojiData>(key: K, val: MojiData[K]) {
     appState.updateMoji({ ...moji, [key]: val });
@@ -19,6 +19,7 @@
   }
 </script>
 
+<fieldset class="editor-fs" disabled={readonly}>
 <div class="editor">
   <!-- テキスト -->
   <section>
@@ -152,8 +153,21 @@
     </div>
   </section>
 </div>
+</fieldset>
 
 <style>
+  .editor-fs {
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  .editor-fs:disabled { opacity: 0.55; }
+
   .editor {
     padding: 4px 8px;
     display: flex;

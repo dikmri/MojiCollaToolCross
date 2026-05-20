@@ -101,6 +101,16 @@
   // CanvasSettingsDialog
   let isCanvasSettingsOpen = $state(false);
 
+  // 文字プロパティパネル: トグル + 最後に選択されたmojiを保持
+  let isPropPanelVisible = $state(true);
+  let displayedMojiId = $state<number | null>(null);
+  $effect(() => {
+    if (appState.selectedMojiId !== null) displayedMojiId = appState.selectedMojiId;
+  });
+  const displayedMoji = $derived(
+    appState.mojiList.find(m => m.id === displayedMojiId) ?? null
+  );
+
   // PNG export
   let canvasSvgEl = $state<SVGSVGElement | undefined>(undefined);
   let isExporting  = $state(false);
@@ -144,6 +154,12 @@
     </div>
     <div class="toolbar-group">
       <button onclick={() => { isCanvasSettingsOpen = true; }}>キャンバス設定</button>
+    </div>
+    <div class="toolbar-group">
+      <button
+        class:active={isPropPanelVisible}
+        onclick={() => { isPropPanelVisible = !isPropPanelVisible; }}
+      >プロパティ</button>
     </div>
     <div class="toolbar-group zoom-group">
       <label for="zoom-input">ズーム</label>
@@ -241,15 +257,18 @@
       </div>
     </main>
 
-    <!-- 右パネル: 文字プロパティ（選択中の文字があるとき表示） -->
-    {#if appState.selectedMoji}
+    <!-- 右パネル: 文字プロパティ（スイッチで表示/非表示、最終選択を保持） -->
+    {#if isPropPanelVisible && displayedMoji}
       <aside class="moji-editor-panel">
         <div class="panel-title">
           文字プロパティ
-          <button class="close-btn" onclick={() => appState.selectMoji(null)}>×</button>
+          {#if appState.selectedMojiId === null}
+            <span class="prop-status">（選択解除中）</span>
+          {/if}
+          <button class="close-btn" onclick={() => { isPropPanelVisible = false; }}>×</button>
         </div>
-        {#key appState.selectedMojiId}
-          <MojiEditor moji={appState.selectedMoji} />
+        {#key displayedMojiId}
+          <MojiEditor moji={displayedMoji} readonly={appState.selectedMojiId === null} />
         {/key}
       </aside>
     {/if}
@@ -486,4 +505,19 @@
     padding: 0 2px;
   }
   .close-btn:hover { opacity: 1; }
+
+  .prop-status {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text);
+    opacity: 0.45;
+    flex: 1;
+    margin-left: 4px;
+  }
+
+  .toolbar button.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
 </style>
