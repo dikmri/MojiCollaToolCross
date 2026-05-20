@@ -166,7 +166,16 @@
     return Math.max(10, Math.min(500, Math.floor(pct)));
   }
 
-  onMount(() => { appState.setZoom(calcFitZoom()); });
+  onMount(() => {
+    appState.setZoom(calcFitZoom());
+
+    // OS のカラースキーム変化を監視してシステムテーマに反映
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    appState.setSystemPrefersDark(mq.matches);
+    const onMqChange = (e: MediaQueryListEvent) => appState.setSystemPrefersDark(e.matches);
+    mq.addEventListener('change', onMqChange);
+    return () => mq.removeEventListener('change', onMqChange);
+  });
 
   // Ctrl+ホイールでズーム（wheel イベントは passive:false が必要なため $effect で登録）
   $effect(() => {
@@ -202,7 +211,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
   class="app"
-  data-theme={appState.theme}
+  data-theme={appState.resolvedTheme}
   tabindex="0"
   role="application"
   onkeydown={handleKeyDown}
@@ -260,10 +269,10 @@
       <button onclick={() => appState.setZoom(100)}>100%</button>
       <button onclick={() => appState.setZoom(calcFitZoom())}>自動調整</button>
     </div>
-    <div class="toolbar-group" style="margin-left:auto; border-right:none;">
-      <button onclick={() => appState.toggleTheme()}>
-        {appState.theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-      </button>
+    <div class="toolbar-group theme-group" style="margin-left:auto; border-right:none;">
+      <button class:active={appState.theme === 'light'}  onclick={() => appState.setTheme('light')}>ライト</button>
+      <button class:active={appState.theme === 'dark'}   onclick={() => appState.setTheme('dark')}>ダーク</button>
+      <button class:active={appState.theme === 'system'} onclick={() => appState.setTheme('system')}>システム</button>
     </div>
   </header>
 
@@ -621,4 +630,9 @@
     color: white;
     border-color: var(--accent);
   }
+
+  /* テーマ選択の3ボタンを連結して見せる */
+  .theme-group button:not(:first-child) { border-left: none; border-radius: 0; }
+  .theme-group button:first-child { border-radius: 3px 0 0 3px; }
+  .theme-group button:last-child  { border-radius: 0 3px 3px 0; border-left: none; }
 </style>

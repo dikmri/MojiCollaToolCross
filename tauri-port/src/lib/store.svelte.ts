@@ -1,7 +1,7 @@
 import type { MojiData, CanvasData, ProjectData, LocatePosition } from './types';
 import { createDefaultCanvasData, createDefaultMojiData } from './types';
 
-export type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'system';
 
 // image dataUrl は大容量のため履歴から除外する
 type HistoryState = {
@@ -26,7 +26,8 @@ function createAppState() {
   let canvasData = $state<CanvasData>(createDefaultCanvasData());
   let selectedMojiId = $state<number | null>(null);
   let zoomPercent = $state(100);
-  let theme = $state<Theme>('light');
+  let theme = $state<Theme>('system');
+  let systemPrefersDark = $state(false);
   let nextId = $state(1);
   let projectFilePath = $state<string | null>(null);
   let colorHistory = $state<string[]>([]);
@@ -98,6 +99,9 @@ function createAppState() {
     },
     get zoomPercent() { return zoomPercent; },
     get theme() { return theme; },
+    get resolvedTheme(): 'light' | 'dark' {
+      return theme === 'system' ? (systemPrefersDark ? 'dark' : 'light') : theme;
+    },
     get projectFilePath() { return projectFilePath; },
     get colorHistory() { return colorHistory; },
     get canUndo() { return undoStack.length > 0 || pendingCapture !== null; },
@@ -205,8 +209,12 @@ function createAppState() {
       zoomPercent = Math.max(10, Math.min(500, pct));
     },
 
-    toggleTheme() {
-      theme = theme === 'light' ? 'dark' : 'light';
+    setTheme(t: Theme) {
+      theme = t;
+    },
+
+    setSystemPrefersDark(isDark: boolean) {
+      systemPrefersDark = isDark;
     },
 
     addToColorHistory(color: string) {
