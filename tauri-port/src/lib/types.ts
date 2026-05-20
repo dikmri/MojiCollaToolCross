@@ -1,4 +1,5 @@
 export type TextDirection = 'yokogaki' | 'tategaki';
+export type TextAlign = 'left' | 'center' | 'right';
 export type LocatePosition = 'left' | 'right' | 'top' | 'bottom';
 
 export interface MojiData {
@@ -27,7 +28,11 @@ export interface MojiData {
   backgroundBoxBorderColor: string;
   backgroundBoxCornerRadius: number;
   rotateAngle: number;
+  textAlign: TextAlign;
 }
+
+// 装飾テンプレート: 位置/テキスト/ID を除いた装飾情報
+export type MojiFormat = Omit<MojiData, 'id' | 'x' | 'y' | 'fullText'>;
 
 export interface ImageData {
   dataUrl: string;        // base64 data URL。'' = 画像なし
@@ -83,6 +88,7 @@ export function createDefaultMojiData(id: number): MojiData {
     backgroundBoxBorderColor: '#FF000000',
     backgroundBoxCornerRadius: 0,
     rotateAngle: 0,
+    textAlign: 'left',
   };
 }
 

@@ -13,10 +13,22 @@
 
   let isOpen = $state(false);
   let beforeColor = $state('');
+  const hasEyeDropper = typeof window !== 'undefined' && 'EyeDropper' in window;
 
   function toggle() {
     if (!isOpen) beforeColor = value;
     isOpen = !isOpen;
+  }
+
+  async function pickColor() {
+    try {
+      const eyeDropper = new (window as any).EyeDropper();
+      const result = await eyeDropper.open();
+      // sRGBHex is "#rrggbb" → convert to "#FFrrggbb" ARGB
+      const argb = '#FF' + result.sRGBHex.slice(1).toUpperCase();
+      onChange(argb);
+      appState.addToColorHistory(argb);
+    } catch { /* user cancelled */ }
   }
 </script>
 
@@ -28,6 +40,9 @@
   <span class="cf-hex" onclick={toggle} role="button" tabindex="0" onkeydown={e=>e.key==='Enter'&&toggle()}>
     {value.slice(1)}
   </span>
+  {#if hasEyeDropper}
+    <button class="cf-eye" onclick={pickColor} title="スポイト（画面から色を取得）">吸</button>
+  {/if}
 </div>
 
 {#if isOpen}
@@ -95,4 +110,16 @@
     margin-top: 4px;
     margin-left: 0;
   }
+
+  .cf-eye {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+  .cf-eye:hover { opacity: 1; }
 </style>

@@ -38,6 +38,12 @@
     return isVertical ? 0 : i * (moji.fontSize + moji.lineMargin);
   }
 
+  const textAnchor = $derived(
+    isVertical ? 'start' :
+    moji.textAlign === 'center' ? 'middle' :
+    moji.textAlign === 'right'  ? 'end'    : 'start'
+  );
+
   // CSS style string per <text> element
   const textStyle = $derived(
     (isVertical ? 'writing-mode: vertical-rl; text-orientation: upright; ' : '') +
@@ -145,7 +151,7 @@
       filter={moji.secondBorderBlurRadius > 0 ? `url(#${filterId2})` : undefined}
     >
       {#each lines as line, i}
-        <text x={lineX(i)} y={lineY(i)} style={textStyle}>{line}</text>
+        <text x={lineX(i)} y={lineY(i)} text-anchor={textAnchor} style={textStyle}>{line}</text>
       {/each}
     </g>
   {/if}
@@ -165,7 +171,7 @@
       filter={moji.borderBlurRadius > 0 ? `url(#${filterId1})` : undefined}
     >
       {#each lines as line, i}
-        <text x={lineX(i)} y={lineY(i)} style={textStyle}>{line}</text>
+        <text x={lineX(i)} y={lineY(i)} text-anchor={textAnchor} style={textStyle}>{line}</text>
       {/each}
     </g>
   {/if}
