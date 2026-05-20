@@ -12,10 +12,8 @@
 ## インストール方法
 
 ### Windows
-1. Releases から `.msi` をダウンロードして実行する
+1. Releases から `_x64_en-US.msi` または `_x64-setup.exe` をダウンロードして実行する
 2. インストーラーの指示に従ってインストール完了
-
-> インストーラーなしで使いたい場合は `.exe` をダウンロードしてそのまま起動できます。
 
 ### macOS
 1. Releases から `.dmg` をダウンロードして開く
@@ -26,15 +24,22 @@
 > macOS Gatekeeper の警告が出る場合は、システム設定 → プライバシーとセキュリティ から「このまま開く」を選択してください。
 
 ### Linux
-1. Releases から `.AppImage` または `.deb` をダウンロードする
-2. AppImage の場合:
+1. Releases から使用ディストリビューションに合ったパッケージをダウンロードする
+   - Debian/Ubuntu 系: `_amd64.deb`
+   - Red Hat/Fedora 系: `_x86_64.rpm`
+   - その他: `_amd64.AppImage`
+2. deb の場合:
+```bash
+sudo dpkg -i MojiCollaToolCross_*.deb
+```
+3. rpm の場合:
+```bash
+sudo rpm -i MojiCollaToolCross-*.rpm
+```
+4. AppImage の場合:
 ```bash
 chmod +x MojiCollaToolCross_*.AppImage
 ./MojiCollaToolCross_*.AppImage
-```
-3. .deb の場合:
-```bash
-sudo dpkg -i MojiCollaToolCross_*.deb
 ```
 
 ### ソースからビルドする場合（全OS共通）
