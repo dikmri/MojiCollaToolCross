@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { appState } from '$lib/store.svelte';
   import { argbToRgba } from '$lib/color';
   import { openProject, saveProject, saveProjectAs, savePngDialog } from '$lib/fileio';
@@ -111,6 +112,57 @@
     appState.mojiList.find(m => m.id === displayedMojiId) ?? null
   );
 
+  // 新規画像（直接image1に設定）
+  let newImageInput: HTMLInputElement | undefined = $state(undefined);
+
+  async function handleNewImage(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = dataUrl;
+      });
+      appState.updateCanvasData({
+        ...appState.canvasData,
+        canvasWidth: img.naturalWidth,
+        canvasHeight: img.naturalHeight,
+        imageMarginLeft: 0,
+        imageMarginTop: 0,
+        imageData1: {
+          dataUrl,
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          modifiedWidth: img.naturalWidth,
+          modifiedHeight: img.naturalHeight,
+        },
+      });
+    } catch { /* ignore */ }
+    (e.target as HTMLInputElement).value = '';
+  }
+
+  // ズーム自動調整
+  let canvasAreaEl: HTMLElement | undefined = $state(undefined);
+
+  function calcFitZoom(): number {
+    if (!canvasAreaEl || cw <= 0 || ch <= 0) return 100;
+    const pct = Math.min(
+      (canvasAreaEl.clientWidth  - 40) / cw,
+      (canvasAreaEl.clientHeight - 40) / ch
+    ) * 100;
+    return Math.max(10, Math.min(500, Math.floor(pct)));
+  }
+
+  onMount(() => { appState.setZoom(calcFitZoom()); });
+
   // PNG export
   let canvasSvgEl = $state<SVGSVGElement | undefined>(undefined);
   let isExporting  = $state(false);
@@ -140,6 +192,16 @@
   <header class="toolbar">
     <div class="toolbar-group">
       <button onclick={() => appState.addMoji()}>文字を追加</button>
+    </div>
+    <div class="toolbar-group">
+      <button onclick={() => newImageInput?.click()}>新規画像</button>
+      <input
+        bind:this={newImageInput}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
+        style="display:none"
+        onchange={handleNewImage}
+      />
     </div>
     <div class="toolbar-group">
       <button onclick={handleOpen}>開く</button>
@@ -173,6 +235,7 @@
       />
       <span>%</span>
       <button onclick={() => appState.setZoom(100)}>100%</button>
+      <button onclick={() => appState.setZoom(calcFitZoom())}>自動調整</button>
     </div>
     <div class="toolbar-group" style="margin-left:auto; border-right:none;">
       <button onclick={() => appState.toggleTheme()}>
@@ -208,7 +271,7 @@
     </aside>
 
     <!-- 中央: キャンバスエリア（MojiPanel以外のクリックで選択解除） -->
-    <main class="canvas-area" onclick={handleCanvasClick} role="presentation">
+    <main class="canvas-area" bind:this={canvasAreaEl} onclick={handleCanvasClick} role="presentation">
       <!--
         zoom対応スクロール:
         helper divが実際のスクロール範囲を決める（スケール後のサイズ + padding）
@@ -262,9 +325,6 @@
       <aside class="moji-editor-panel">
         <div class="panel-title">
           文字プロパティ
-          {#if appState.selectedMojiId === null}
-            <span class="prop-status">（選択解除中）</span>
-          {/if}
           <button class="close-btn" onclick={() => { isPropPanelVisible = false; }}>×</button>
         </div>
         {#key displayedMojiId}
@@ -505,15 +565,6 @@
     padding: 0 2px;
   }
   .close-btn:hover { opacity: 1; }
-
-  .prop-status {
-    font-size: 10px;
-    font-weight: 400;
-    color: var(--text);
-    opacity: 0.45;
-    flex: 1;
-    margin-left: 4px;
-  }
 
   .toolbar button.active {
     background: var(--accent);
