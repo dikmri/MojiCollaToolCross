@@ -60,6 +60,21 @@
     (e.target as HTMLInputElement).value = '';
   }
 
+  async function handleImg1FileChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const data = await readImageFile(file);
+      img1   = data;
+      // 画像1を読み込んだらキャンバスサイズを自動調整
+      width  = data.modifiedWidth;
+      height = data.modifiedHeight;
+    } catch (err) {
+      console.error(err);
+    }
+    (e.target as HTMLInputElement).value = '';
+  }
+
   function clearImg(setter: (d: ImageData) => void) {
     setter({ dataUrl: '', width: 0, height: 0, modifiedWidth: 0, modifiedHeight: 0 });
   }
@@ -143,7 +158,7 @@
         type="file"
         accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
         style="display:none"
-        onchange={e => handleFileChange(e, d => { img1 = d; })}
+        onchange={handleImg1FileChange}
       />
       {#if img1.dataUrl}
         <div class="row">
