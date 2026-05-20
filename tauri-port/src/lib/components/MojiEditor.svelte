@@ -21,6 +21,12 @@
 
 <fieldset class="editor-fs" disabled={readonly}>
 <div class="editor">
+
+  <!-- 複製 -->
+  <div class="dup-row">
+    <button class="dup-btn" onclick={() => appState.duplicateMoji(moji.id)}>複製</button>
+  </div>
+
   <!-- テキスト -->
   <section>
     <div class="sec-title">テキスト</div>
@@ -30,6 +36,20 @@
       oninput={e => upd('fullText', (e.target as HTMLTextAreaElement).value)}
       rows="4"
     ></textarea>
+  </section>
+
+  <!-- 位置 -->
+  <section>
+    <div class="sec-title">位置</div>
+    <div class="row">
+      <label class="lbl">X</label>
+      <input class="num-input" type="number" min="-9999" max="99999"
+        value={Math.round(moji.x)} onchange={e => upd('x', numVal(e))} />
+      <label class="lbl" style="margin-left:6px">Y</label>
+      <input class="num-input" type="number" min="-9999" max="99999"
+        value={Math.round(moji.y)} onchange={e => upd('y', numVal(e))} />
+      <span class="unit">px</span>
+    </div>
   </section>
 
   <!-- フォント -->
@@ -156,6 +176,22 @@
 </fieldset>
 
 <style>
+  .dup-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 0 0;
+  }
+  .dup-btn {
+    font-size: 11px;
+    padding: 3px 12px;
+    border: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--text);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .dup-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
   .editor-fs {
     border: none;
     padding: 0;
