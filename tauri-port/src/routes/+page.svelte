@@ -83,6 +83,8 @@
     if (e.key === 'Escape') { appState.selectMoji(null); return; }
 
     if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); appState.undo(); return; }
+      if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); appState.redo(); return; }
       if (e.key === 's' && e.shiftKey) { e.preventDefault(); await handleSaveAs(); return; }
       if (e.key === 's')               { e.preventDefault(); await handleSave();   return; }
       if (e.key === 'o')               { e.preventDefault(); await handleOpen();   return; }
@@ -163,6 +165,20 @@
 
   onMount(() => { appState.setZoom(calcFitZoom()); });
 
+  // Ctrl+ホイールでズーム（wheel イベントは passive:false が必要なため $effect で登録）
+  $effect(() => {
+    const el = canvasAreaEl;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const step = e.deltaY > 0 ? -10 : 10;
+      appState.setZoom(appState.zoomPercent + step);
+    };
+    el.addEventListener('wheel', handler, { passive: false });
+    return () => el.removeEventListener('wheel', handler);
+  });
+
   // PNG export
   let canvasSvgEl = $state<SVGSVGElement | undefined>(undefined);
   let isExporting  = $state(false);
@@ -202,6 +218,10 @@
         style="display:none"
         onchange={handleNewImage}
       />
+    </div>
+    <div class="toolbar-group">
+      <button onclick={() => appState.undo()} disabled={!appState.canUndo} title="元に戻す (Ctrl+Z)">↩</button>
+      <button onclick={() => appState.redo()} disabled={!appState.canRedo} title="やり直し (Ctrl+Y)">↪</button>
     </div>
     <div class="toolbar-group">
       <button onclick={handleOpen}>開く</button>
@@ -258,11 +278,11 @@
           onkeydown={e => e.key === 'Enter' && appState.selectMoji(moji.id)}
         >
           <span class="moji-preview">{moji.fullText.slice(0, 10).replace(/\n/g, '↵')}</span>
-          <button
-            class="moji-delete"
-            onclick={e => { e.stopPropagation(); appState.removeMoji(moji.id); }}
-            aria-label="削除"
-          >×</button>
+          <div class="moji-actions">
+            <button class="moji-order" onclick={e => { e.stopPropagation(); appState.moveMojiForward(moji.id); }} title="前面へ">▲</button>
+            <button class="moji-order" onclick={e => { e.stopPropagation(); appState.moveMojiBackward(moji.id); }} title="背面へ">▼</button>
+            <button class="moji-delete" onclick={e => { e.stopPropagation(); appState.removeMoji(moji.id); }} aria-label="削除">×</button>
+          </div>
         </div>
       {/each}
       {#if appState.mojiList.length === 0}
@@ -487,6 +507,25 @@
     flex: 1;
   }
 
+  .moji-actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .moji-order {
+    background: none;
+    border: none;
+    color: var(--text);
+    opacity: 0.35;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .moji-order:hover { opacity: 1; color: var(--accent); }
+
   .moji-delete {
     background: none;
     border: none;
@@ -499,6 +538,14 @@
   }
 
   .moji-delete:hover { opacity: 1; color: #e53935; }
+
+  .toolbar button:disabled {
+    opacity: 0.35;
+    cursor: default;
+    background: var(--panel-bg);
+    color: var(--text);
+    border-color: var(--border);
+  }
 
   .empty-hint {
     padding: 16px 8px;
