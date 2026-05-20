@@ -49,7 +49,8 @@
   async function handleSave() {
     const path = appState.projectFilePath;
     if (path) {
-      await saveProject(appState.toProjectData(), path);
+      const actual = await saveProject(appState.toProjectData(), path);
+      if (actual && actual !== path) appState.setProjectFilePath(actual);
     } else {
       const newPath = await saveProjectAs(appState.toProjectData());
       if (newPath) appState.setProjectFilePath(newPath);
@@ -87,9 +88,10 @@
     }
   }
 
-  // Deselect on canvas background click
-  function handleCanvasClick(e: MouseEvent) {
-    if (e.target === e.currentTarget) appState.selectMoji(null);
+  // キャンバスエリアのクリックで選択解除
+  // MojiPanelのhitRectがe.stopPropagation()するため、文字クリックは届かない
+  function handleCanvasClick() {
+    appState.selectMoji(null);
   }
 
   function onZoomChange(e: Event) {
@@ -189,7 +191,7 @@
       {/if}
     </aside>
 
-    <!-- 中央: キャンバスエリア -->
+    <!-- 中央: キャンバスエリア（MojiPanel以外のクリックで選択解除） -->
     <main class="canvas-area" onclick={handleCanvasClick} role="presentation">
       <!--
         zoom対応スクロール:
