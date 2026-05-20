@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { appState } from '$lib/store.svelte';
   import { argbToRgba } from '$lib/color';
-  import { openProject, saveProject, saveProjectAs, savePngDialog } from '$lib/fileio';
+  import { openProject, saveProject, saveProjectAs, savePngDialog, openProjectFromPath, loadImageFromPath } from '$lib/fileio';
+  import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
   import { renderToPngDataUrl } from '$lib/pngExport';
   import MojiPanel from '$lib/components/MojiPanel.svelte';
   import MojiEditor from '$lib/components/MojiEditor.svelte';
@@ -174,7 +175,24 @@
     appState.setSystemPrefersDark(mq.matches);
     const onMqChange = (e: MediaQueryListEvent) => appState.setSystemPrefersDark(e.matches);
     mq.addEventListener('change', onMqChange);
-    return () => mq.removeEventListener('change', onMqChange);
+
+    // Tauri ドラッグ&ドロップイベント登録
+    let unlistenDrop: (() => void) | null = null;
+    getCurrentWebviewWindow().onDragDropEvent((event) => {
+      const p = event.payload;
+      if (p.type === 'enter' || p.type === 'over') {
+        isDragOver = true;
+      } else if (p.type === 'leave') {
+        isDragOver = false;
+      } else if (p.type === 'drop') {
+        handleDrop(p.paths);
+      }
+    }).then(fn => { unlistenDrop = fn; });
+
+    return () => {
+      mq.removeEventListener('change', onMqChange);
+      unlistenDrop?.();
+    };
   });
 
   // Ctrl+ホイールでズーム（wheel イベントは passive:false が必要なため $effect で登録）
@@ -190,6 +208,41 @@
     el.addEventListener('wheel', handler, { passive: false });
     return () => el.removeEventListener('wheel', handler);
   });
+
+  // ドラッグ&ドロップ
+  let isDragOver = $state(false);
+
+  async function handleDrop(paths: string[]) {
+    isDragOver = false;
+    // .mccp ファイルを優先してロード
+    const mccpPath = paths.find(p => p.toLowerCase().endsWith('.mccp'));
+    if (mccpPath) {
+      const result = await openProjectFromPath(mccpPath);
+      if (result) appState.loadProject(result.data, result.path);
+      return;
+    }
+    // 画像ファイルを image1 にロード
+    const imgPath = paths.find(p => /\.(png|jpe?g|gif|webp|bmp)$/i.test(p));
+    if (imgPath) {
+      const imgData = await loadImageFromPath(imgPath);
+      if (imgData) {
+        appState.updateCanvasData({
+          ...appState.canvasData,
+          canvasWidth: imgData.width,
+          canvasHeight: imgData.height,
+          imageMarginLeft: 0,
+          imageMarginTop: 0,
+          imageData1: {
+            dataUrl: imgData.dataUrl,
+            width: imgData.width,
+            height: imgData.height,
+            modifiedWidth: imgData.width,
+            modifiedHeight: imgData.height,
+          },
+        });
+      }
+    }
+  }
 
   // PNG export
   let canvasSvgEl = $state<SVGSVGElement | undefined>(undefined);
@@ -368,6 +421,12 @@
 
   {#if isCanvasSettingsOpen}
     <CanvasSettingsDialog onClose={() => { isCanvasSettingsOpen = false; }} />
+  {/if}
+
+  {#if isDragOver}
+    <div class="drop-overlay">
+      <div class="drop-hint">ここにドロップ<br/><small>画像 / .mccp プロジェクト</small></div>
+    </div>
   {/if}
 </div>
 
@@ -635,4 +694,35 @@
   .theme-group button:not(:first-child) { border-left: none; border-radius: 0; }
   .theme-group button:first-child { border-radius: 3px 0 0 3px; }
   .theme-group button:last-child  { border-radius: 0 3px 3px 0; border-left: none; }
+
+  /* ドラッグ&ドロップ オーバーレイ */
+  .drop-overlay {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    border: 3px dashed var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .drop-hint {
+    background: var(--panel-bg);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 24px 40px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .drop-hint small {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.7;
+  }
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appState } from '$lib/store.svelte';
   import type { MojiData } from '$lib/types';
+  import { saveMojiFormat, loadMojiFormat } from '$lib/fileio';
   import ColorField from './ColorField.svelte';
   import FontPicker from './FontPicker.svelte';
 
@@ -17,13 +18,25 @@
   function checked(e: Event) {
     return (e.target as HTMLInputElement).checked;
   }
+
+  async function handleSaveFormat() {
+    const { id, x, y, fullText, ...format } = moji;
+    await saveMojiFormat(format);
+  }
+
+  async function handleLoadFormat() {
+    const format = await loadMojiFormat();
+    if (format) appState.applyFormat(format);
+  }
 </script>
 
 <fieldset class="editor-fs" disabled={readonly}>
 <div class="editor">
 
-  <!-- 複製 -->
+  <!-- 複製 / フォーマット -->
   <div class="dup-row">
+    <button class="dup-btn" onclick={handleLoadFormat} title="フォーマットファイルを読み込んでこの文字に適用">書式読込</button>
+    <button class="dup-btn" onclick={handleSaveFormat} title="この文字の書式をファイルに保存">書式保存</button>
     <button class="dup-btn" onclick={() => appState.duplicateMoji(moji.id)}>複製</button>
   </div>
 
@@ -83,6 +96,17 @@
           checked={moji.textDirection === 'tategaki'}
           onchange={() => upd('textDirection', 'tategaki')} /> 縦書き
       </label>
+    </div>
+    <div class="row">
+      <label class="lbl">揃え</label>
+      <div class="align-group">
+        <button class="align-btn" class:align-active={!moji.textAlign || moji.textAlign === 'left'}
+          onclick={() => upd('textAlign', 'left')} title="左揃え">左</button>
+        <button class="align-btn" class:align-active={moji.textAlign === 'center'}
+          onclick={() => upd('textAlign', 'center')} title="中央揃え">中</button>
+        <button class="align-btn" class:align-active={moji.textAlign === 'right'}
+          onclick={() => upd('textAlign', 'right')} title="右揃え">右</button>
+      </div>
     </div>
     <div class="row">
       <label class="lbl">文字間</label>
@@ -298,4 +322,24 @@
   }
 
   .reset-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .align-group {
+    display: flex;
+    gap: 0;
+  }
+
+  .align-btn {
+    font-size: 11px;
+    padding: 2px 7px;
+    border: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 0;
+    margin-left: -1px;
+  }
+  .align-btn:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+  .align-btn:last-child  { border-radius: 0 3px 3px 0; }
+  .align-btn:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+  .align-btn.align-active { background: var(--accent); color: white; border-color: var(--accent); z-index: 1; }
 </style>

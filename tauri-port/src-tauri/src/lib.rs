@@ -90,6 +90,11 @@ fn clean_font_stem(stem: &str) -> String {
 }
 
 #[tauri::command]
+fn read_file_bytes(path: String) -> Result<Vec<u8>, String> {
+    std::fs::read(&path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn get_system_fonts() -> Vec<String> {
     let mut names: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
     // 汎用ファミリは常に追加
@@ -137,6 +142,7 @@ pub fn run() {
             save_project,
             load_project,
             save_image,
+            read_file_bytes,
             get_system_fonts,
         ])
         .run(tauri::generate_context!())

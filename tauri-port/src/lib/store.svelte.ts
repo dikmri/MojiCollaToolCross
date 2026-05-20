@@ -1,4 +1,4 @@
-import type { MojiData, CanvasData, ProjectData, LocatePosition } from './types';
+import type { MojiData, CanvasData, ProjectData, LocatePosition, MojiFormat } from './types';
 import { createDefaultCanvasData, createDefaultMojiData } from './types';
 
 export type Theme = 'light' | 'dark' | 'system';
@@ -238,6 +238,15 @@ function createAppState() {
 
     setProjectFilePath(path: string | null) {
       projectFilePath = path;
+    },
+
+    applyFormat(format: MojiFormat) {
+      if (selectedMojiId === null) return;
+      const idx = mojiList.findIndex(m => m.id === selectedMojiId);
+      if (idx === -1) return;
+      flushPending();
+      pushHistory(captureState());
+      mojiList[idx] = { ...mojiList[idx], ...format };
     },
   };
 }
