@@ -13,27 +13,26 @@ export async function openProject(): Promise<{ data: ProjectData; path: string }
   return { data: JSON.parse(json) as ProjectData, path };
 }
 
-export async function saveProject(data: ProjectData, path: string): Promise<boolean> {
+/** プロジェクトを保存し、実際に書き込んだパスを返す（連番付与済み）。 */
+export async function saveProject(data: ProjectData, path: string): Promise<string | null> {
   try {
-    await invoke('save_project', { path, data: JSON.stringify(data, null, 2) });
-    return true;
+    return await invoke<string>('save_project', { path, data: JSON.stringify(data, null, 2) });
   } catch {
-    return false;
+    return null;
   }
 }
 
 export async function saveProjectAs(data: ProjectData): Promise<string | null> {
   const path = await save({ filters: FILTER, defaultPath: `project.${EXTENSION}` });
   if (!path) return null;
-  await saveProject(data, path);
-  return path;
+  return saveProject(data, path);
 }
 
 export async function saveImage(path: string, dataUrl: string): Promise<boolean> {
   try {
     const base64 = dataUrl.split(',')[1];
     const bytes = Array.from(atob(base64), c => c.charCodeAt(0));
-    await invoke('save_image', { path, data: bytes });
+    await invoke<string>('save_image', { path, data: bytes });
     return true;
   } catch {
     return false;

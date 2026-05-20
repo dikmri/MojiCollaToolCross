@@ -70,6 +70,11 @@
     hitEl?.setPointerCapture(e.pointerId);
   }
 
+  // click イベントの伝播を止めて、親要素の全体デセレクト処理をブロックする
+  function handleClick(e: MouseEvent) {
+    e.stopPropagation();
+  }
+
   function handlePointerMove(e: PointerEvent) {
     if (!dragStart) return;
     const dx = (e.clientX - dragStart.px) / zoomScale;
@@ -189,5 +194,6 @@
     onpointerdown={handlePointerDown}
     onpointermove={handlePointerMove}
     onpointerup={handlePointerUp}
+    onclick={handleClick}
   />
 </g>

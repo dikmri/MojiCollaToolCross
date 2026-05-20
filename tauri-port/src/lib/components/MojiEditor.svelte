@@ -2,6 +2,7 @@
   import { appState } from '$lib/store.svelte';
   import type { MojiData } from '$lib/types';
   import ColorField from './ColorField.svelte';
+  import FontPicker from './FontPicker.svelte';
 
   interface Props { moji: MojiData; }
   let { moji }: Props = $props();
@@ -35,12 +36,9 @@
     <div class="sec-title">フォント</div>
     <div class="row">
       <label class="lbl">フォント</label>
-      <input
-        class="txt-input flex1"
-        type="text"
-        value={moji.fontFamilyName}
-        onchange={e => upd('fontFamilyName', (e.target as HTMLInputElement).value)}
-      />
+      <div class="flex1">
+        <FontPicker value={moji.fontFamilyName} onChange={v => upd('fontFamilyName', v)} />
+      </div>
     </div>
     <div class="row">
       <label class="lbl">サイズ</label>
@@ -217,15 +215,6 @@
     color: var(--text);
     border-radius: 3px;
     min-height: 60px;
-  }
-
-  .txt-input {
-    font-size: 12px;
-    padding: 2px 4px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    border-radius: 3px;
   }
 
   .flex1 { flex: 1; min-width: 0; }
